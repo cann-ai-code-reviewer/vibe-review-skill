@@ -1,0 +1,25 @@
+{
+  "name": "@tsukiyokai/vibe-review",
+  "version": "1.0.0",
+  "description": "Code review skill for Claude Code — install via npx",
+  "type": "module",
+  "bin": {
+    "vibe-review": "./bin/install.mjs"
+  },
+  "files": [
+    "bin/",
+    "skill/"
+  ],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "code-review",
+    "skill"
+  ],
+  "author": "tsukiyokai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tsukiyokai/vibe-review-skill.git"
+  }
+}
