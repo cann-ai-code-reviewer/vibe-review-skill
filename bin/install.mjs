@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SKILL_SRC = resolve(__dirname, "..", "skill", "vibe-review");
+const SKILL_SRC = resolve(__dirname, "..", "skills", "vibe-review");
 const SKILL_NAME = "vibe-review";
 
 function usage() {

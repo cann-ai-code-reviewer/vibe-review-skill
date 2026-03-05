@@ -4,7 +4,12 @@
 
 ## 快速开始
 
-使用 `npx skills add`:
+```bash
+npx @tsukiyokai/vibe-review --global
+```
+
+或通过 [skills.sh](https://skills.sh/) 安装：
+
 ```bash
 npx skills add tsukiyokai/vibe-review-skill
 ```
@@ -86,10 +91,14 @@ CHK_SAFETY_FUNC_RET(ret);
 ## 安装 / 卸载
 
 ```bash
+# 方式一：npm（推荐）
+npx @tsukiyokai/vibe-review --global          # 全局安装
+npx @tsukiyokai/vibe-review                   # 项目级安装
+npx @tsukiyokai/vibe-review --remove --global  # 全局卸载
+npx @tsukiyokai/vibe-review --remove           # 项目级卸载
 
+# 方式二：skills.sh
 npx skills add tsukiyokai/vibe-review-skill
-
-# 卸载
 npx skills rm --global vibe-review
 ```
 
