@@ -1,5 +1,7 @@
 # @tsukiyokai/vibe-review
 
+[![npm](https://img.shields.io/npm/v/@tsukiyokai/vibe-review)](https://www.npmjs.com/package/@tsukiyokai/vibe-review)
+
 [Claude Code](https://docs.anthropic.com/en/docs/claude-code)的代码审查skill —— 结构化、置信度分级、标准感知。支持C++和Python。
 
 ## 快速开始
@@ -40,17 +42,33 @@ npx skills add tsukiyokai/vibe-review-skill
 
 ## 分层标准
 
-标准按层级加载 —— 上层是通用规则，下层是团队和项目的细化。skill自动识别当前仓库，加载匹配的标准层。
+标准按层级加载 —— 外层是通用规则，内层是团队和项目的细化。skill自动识别当前仓库，加载匹配的标准层。
 
 ```
-company.md          # 公司规范
-└─ dept.md          # 部门红线 & TOP-N
-   └─ productline-* # 产品线 (CANN C++)
-      └─ project-*  # 项目级 (HCCL/FA/MC2)
-         └─ personal.md # 个人审查习惯
+┌───────────────────────────────────────────┐
+│ Company                                   │
+│ ┌───────────────────────────────────────┐ │
+│ │ Department                            │ │
+│ │ ┌───────────────────────────────────┐ │ │
+│ │ │ Product Line                      │ │ │
+│ │ │ ┌───────────────────────────────┐ │ │ │
+│ │ │ │ Project                       │ │ │ │
+│ │ │ │ ┌───────────────────────────┐ │ │ │ │
+│ │ │ │ │ Personal                  │ │ │ │ │
+│ │ │ │ └───────────────────────────┘ │ │ │ │
+│ │ │ └───────────────────────────────┘ │ │ │
+│ │ └───────────────────────────────────┘ │ │
+│ └───────────────────────────────────────┘ │
+└───────────────────────────────────────────┘
 ```
 
-> 文件位于 `references/` 目录，前缀 `standards-` 已省略。
+| 层级 | 文件 | 内容 |
+| ---- | ---- | ---- |
+| Company | `standards-company.md` | 公司级规范 |
+| Department | `standards-dept.md` | 部门红线 & TOP-N |
+| Product Line | `standards-productline-*.md` | 产品线规范 (CANN C++) |
+| Project | `standards-project-*.md` | 项目级规范 (HCCL/FA/MC2) |
+| Personal | `standards-personal.md` | 个人审查习惯 |
 
 ## 输出示例
 
@@ -91,27 +109,27 @@ CHK_SAFETY_FUNC_RET(ret);
 ## 安装 / 卸载
 
 ```bash
-# 方式一：npm（推荐）
-npx @tsukiyokai/vibe-review --global          # 全局安装
-npx @tsukiyokai/vibe-review                   # 项目级安装
+# 方式一：npm
+npx @tsukiyokai/vibe-review --global           # 全局安装
+npx @tsukiyokai/vibe-review                    # 项目级安装
 npx @tsukiyokai/vibe-review --remove --global  # 全局卸载
 npx @tsukiyokai/vibe-review --remove           # 项目级卸载
 
 # 方式二：skills.sh
-npx skills add tsukiyokai/vibe-review-skill
-npx skills rm --global vibe-review
+npx skills add tsukiyokai/vibe-review-skill    # 安装
+npx skills rm --global vibe-review             # 卸载
 ```
 
 ## 自定义
 
-安装后编辑 `.claude/skills/vibe-review/references/` 下的文件：
+安装后编辑 `references/` 下的标准文件：
 
-| 文件                      | 用途                |
-| ------------------------- | ------------------- |
-| `standards-company.md`    | 公司级编码规范      |
-| `standards-dept.md`       | 部门红线及TOP-N问题 |
-| `standards-personal.md`   | 个人审查偏好        |
-| `false-positives.md`      | 需要抑制的误报模式  |
+| 文件                    | 用途                |
+| ----------------------- | ------------------- |
+| `standards-company.md`  | 公司级编码规范      |
+| `standards-dept.md`     | 部门红线及TOP-N问题 |
+| `standards-personal.md` | 个人审查偏好        |
+| `false-positives.md`    | 需要抑制的误报模式  |
 
 如需支持新项目，创建 `standards-project-<name>.md` 并更新 `SKILL.md` 中的路由表。
 
