@@ -28,6 +28,7 @@ npx skills add tsukiyokai/vibe-review-skill
 
 - 先读完整上下文（调用者、头文件、基类），再做判断
 - 用工具验证每个发现 —— 不猜行号，不猜指针是否为空
+- 约束反证：对每个非"确定"发现，主动构造反证条件并用工具验证，抑制误报
 - 标注置信度（确定 / 较确定 / 待确认）和严重级别（严重 / 一般 / 建议）
 - 引用具体规则编号，过滤已知误报模式
 
@@ -38,7 +39,8 @@ npx skills add tsukiyokai/vibe-review-skill
 3. 读取完整上下文 — grep调用者、头文件、基类
 4. 逐条检查必检规则 — 空指针、越界、格式串…
 5. 工具验证每个发现
-6. 输出结构化报告
+6. 约束反证 — 对非"确定"发现执行反证检验（见下方说明）
+7. 输出结构化报告
 
 ## 分层标准
 
@@ -70,6 +72,28 @@ npx skills add tsukiyokai/vibe-review-skill
 | Project | `standards-project-*.md` | 项目级规范 (HCCL/FA/MC2) |
 | Personal | `standards-personal.md` | 个人审查习惯 |
 
+## 约束反证
+
+AI代码检视的核心挑战是误报。纯LLM判断"这像是个bug"不够可靠 —— 必须反过来问：在什么条件下这个问题不成立？然后用工具验证。
+
+受腾讯LLM4PFA（[arxiv 2506.10322](https://arxiv.org/abs/2506.10322)）启发，vibe-review对每个非"确定"置信度的发现执行约束反证：
+
+1. 列出反证条件 — 按bug类别枚举"若成立则为误报"的条件
+2. 工具验证 — 用Read/Grep/git show验证每个条件，不凭推测
+3. 判定 — 反证成立则抑制；部分成立则标"待确认"并注明原因；不成立则升级为"较确定"并附依据
+
+典型反证条件：
+
+| bug类别 | 反证条件（成立则为误报） |
+| ---- | ---- |
+| 空指针解引用 | 调用链上游已判空；构造函数保证非空；值域约束排除null |
+| 整数溢出 | 操作数受业务约束（枚举值、小常量）；类型提升后安全 |
+| 资源泄漏 | RAII/智能指针管理；析构函数自动释放 |
+| 数组越界 | 索引受循环条件/前置校验约束；容器有边界保护 |
+| 并发问题 | 变量仅单线程访问；已有锁/原子操作保护 |
+
+LLM4PFA在工业级C/C++项目（Linux Kernel、OpenSSL、Libav）上过滤了72%-96%的误报，同时保持0.93的recall。vibe-review采用类似的"先提取约束、再验证可行性"思路，将其适配到交互式code review场景。
+
 ## 输出示例
 
 ````
@@ -79,7 +103,7 @@ npx skills add tsukiyokai/vibe-review-skill
 
 ## 审查发现
 
-共发现3个问题（严重1 / 一般1 / 建议1）
+共发现2个问题（严重2 / 一般0 / 建议0）
 
 ---
 
@@ -101,9 +125,27 @@ CHK_SAFETY_FUNC_RET(ret);
 
 ---
 
+### #2 [严重] Destroy持锁期间执行阻塞同步操作
+- 位置：src/channel/hcomm_channel.cpp:245-250
+- 规则：CON-04
+- 置信度：较确定
+- 反证：已检查是否有异步替代路径或锁外执行的可能。确认hcclStreamSynchronize必须在channelMutex_持锁期间调用（stream句柄在锁保护范围内），且无超时参数。反证条件不成立。
+
+问题代码：
+```cpp
+std::lock_guard<std::mutex> lock(channelMutex_);
+// ... 持锁期间
+hcclStreamSynchronize(stream);  // 可阻塞60s+
+```
+
+修复建议：
+将stream同步移到锁外，或使用带超时的同步API。
+
+---
+
 ## 总结
 
-建议优先处理1个严重问题。整体重试逻辑合理。
+建议优先处理2个严重问题。整体重试逻辑合理。
 ````
 
 ## 安装 / 卸载
