@@ -1750,7 +1750,7 @@ is happening without having to first figure out exactly
 which overload is being called.
 
 You may write a function that takes a `const
-std::string&` and overload it with another that
+std:string&` and overload it with another that
 takes `const char*`. However, in this case consider
 `std::string_view`
 instead.
@@ -2039,7 +2039,7 @@ Use rvalue references only in certain special cases listed below.
 Rvalue references
 are a type of reference that can only bind to temporary
 objects. The syntax is similar to traditional reference
-syntax. For example, `void f(std::string&&
+syntax. For example, `void f(std:string&&
 s);` declares a function whose argument is an
 rvalue reference to a `std::string`.
 
