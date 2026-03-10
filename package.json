@@ -1,6 +1,6 @@
 {
   "name": "@tsukiyokai/vibe-review",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Code review skill for Claude Code — install via npx",
   "type": "module",
   "bin": {
