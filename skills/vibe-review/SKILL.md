@@ -50,6 +50,8 @@ $ARGUMENTS
 
 | 文件                                  | 内容                                        |
 | ------------------------------------- | ------------------------------------------- |
+| HCCL集合通信库使用指南.md             | HCCL综合性中文指南，覆盖使用流程和配置      |
+| Ascend C算子开发指南.md               | Ascend C算子开发全流程中文指南              |
 | user-guide.md                         | HCCL使用指南，理解集合通信整体流程          |
 | api-c.md / api-cpp.md / api-python.md | HCCL对外API规格，校验接口用法是否符合契约   |
 | ascendc-hccl.md                       | AscendC集成HCCL的方式，理解算子与通信的交互 |
