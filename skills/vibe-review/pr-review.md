@@ -63,9 +63,10 @@ cd "$WORK_DIR"
 若 `gh api` 成功，从返回 JSON 中提取：
 - `base.ref` → TARGET_BRANCH（若用户未通过 `--base` 指定）
 - `head.ref` → SOURCE_BRANCH
-- 然后 `git fetch origin {SOURCE_BRANCH}:pr-{PR_NUMBER}` 并跳到 Step 5
+- 然后 `git fetch origin {SOURCE_BRANCH}:pr-{PR_NUMBER}`，成功则跳到 Step 5
+- 注意：PR 合并后 head 分支可能已被删除，此时 fetch 会失败（`couldn't find remote ref`），应静默降级到下方通用 ref fetch
 
-**通用 ref fetch（所有平台的兜底方案）：**
+**通用 ref fetch（所有平台的兜底方案，或 gh api 的 head 分支 fetch 失败时）：**
 
 按平台依次尝试不同的 PR ref 格式，首个成功即停止：
 
