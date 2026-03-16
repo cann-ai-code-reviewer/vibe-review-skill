@@ -24,9 +24,8 @@
 ## Step 2: 检查本地是否已有该仓库
 
 1. 检查当前工作目录是否就是目标仓库（`git remote -v` 比对 OWNER/REPO）
-2. 若不是，读取本 skill 目录下的 `references/standards-personal.md` 中的"本地仓库映射"表格，查找 `{PLATFORM}/{OWNER}/{REPO}` 对应的本地路径
-3. 若找到匹配的本地仓库 → 在该仓库中 `git fetch origin` 后跳到 Step 4
-4. 若均未命中 → 进入 Step 3
+2. 若是 → `git fetch origin` 后跳到 Step 4
+3. 若不是 → 进入 Step 3
 
 ## Step 3: Clone 或复用仓库
 
