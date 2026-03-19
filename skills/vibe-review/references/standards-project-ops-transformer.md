@@ -2240,12 +2240,12 @@ tilingKey |= (mte2Config << BIT_OFFSET);
 
 ### 数据来源
 
-- 主仓： /Users/shanshan/repo/cann/ops-transformer/
+- 主仓： ~/repo/cann/ops-transformer/
   - 提交总数：1323（已排除merge commit）
   - 缺陷提交数：243（占比18.4%）
   - 分析周期：全量git历史
   - 中间产物：defect_analysis.md, revert_analysis.md, hotspot_analysis.md, pattern_summary.md
-- dev仓： /Users/shanshan/repo/cann/ops-transformer-dev/
+- dev仓： ~/repo/cann/ops-transformer-dev/
   - 提交总数：2822（非merge: 2820）
   - 确认缺陷：788条（阶段1关键词初筛）
   - 代码缺陷：528条（阶段2全量diff分析确认）
