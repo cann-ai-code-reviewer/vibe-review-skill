@@ -89,19 +89,27 @@ vibe-review skill 在审查 ops-transformer 仓时产生误报。当前 `referen
 4. 执行修改
 
 5. 验证循环（最多3轮）
-   ┌─ 对 issue 里的 PR 重新跑 vibe-review
-   ├─ 该发现未出现 → 验证通过，退出循环
-   ├─ 该发现仍出现 → 重新分析修改方案，再次修改，进入下一轮
-   └─ 第3轮仍失败 → 回滚本 issue 的所有修改，标记为"需人工处理"
+   ┌─ 清理 /tmp/vibe-review-{REPO}-{PR_NUMBER}（确保干净工作区）
+   ├─ 对 issue 里的 PR 重新跑 vibe-review
+   ├─ 判定标准：Claude 判断新报告中是否仍存在"相同根因"的发现
+   │   - 相同根因：规则 ID 相同 + 同一代码位置（允许行号因代码变动而偏移）
+   │   - 若发现已消失或降为"待确认" → 验证通过，退出循环
+   │   - 若相同根因的发现仍以"确定"或"较确定"出现 → 本轮失败
+   ├─ 失败 → 重新分析修改方案，再次修改，进入下一轮
+   │   每轮修改后立即 `git add` 但不 commit（等验证通过后一次性 commit）
+   └─ 第3轮仍失败 → `git checkout -- <modified-files>` 回滚本 issue 的所有修改
+                    → 在原 issue 下发布失败报告 comment，标记为"需人工处理"
 
-6. 通过后：记录验证报告（含轮次和修改内容）
+6. 验证通过后：
+   - `git add` + `git commit`（commit message 含 issue 编号，如 `fix: 修复误报 #42`）
+   - 记录验证报告（含轮次和修改内容）
 ```
 
 ### 批量处理策略
 
 - 多个 issue 逐一串行处理（避免修改冲突）
 - 某个 issue 验证失败不影响其他 issue 的处理
-- 所有 issue 处理完毕后统一创建一个 PR
+- 所有 issue 处理完毕后，若至少有一个 issue 验证通过，则创建 PR；若全部失败则不创建 PR，失败报告已在各 issue 下发布
 
 ---
 
@@ -128,6 +136,9 @@ skills/vibe-review/SKILL.md（仅在规则本身需要收窄时）
 allowed-tools:
   - Read
   - Edit
+  - Write
+  - Grep
+  - Glob
   - Bash(gh api *)
   - Bash(gh issue *)
   - Bash(gh pr *)
@@ -144,7 +155,6 @@ allowed-tools:
   - Bash(git merge-base *)
   - Bash(git rev-parse *)
   - Bash(git branch *)
-  - Bash(gh api *)
   - Bash(wc *)
   - Bash(rm -rf /tmp/vibe-review-*)
   - Bash(ls /tmp/vibe-review-*)
@@ -209,9 +219,9 @@ allowed-tools:
 
 - **分支名**：`fix/false-positive-issues-42-43`
 - **PR 标题**：`fix: 修复误报 #42 #43`
-- **PR 描述**：列出处理的 issue 编号及结论（通过/失败）
-- **Closes 关联**：通过 `Closes #42` 在 PR 合并时自动关闭 issue
-- **验证报告**：每个 issue 一条独立 comment
+- **PR 描述**：列出处理的 issue 编号及结论（通过/失败）；仅验证通过的 issue 使用 `Closes #N`，失败的 issue 使用 `Related #N`
+- **验证报告**：每个 issue 一条独立 comment（通过和失败的均发布）
+- **推送目标**：`origin`（当前仓库的主 remote）
 
 ---
 
@@ -220,7 +230,8 @@ allowed-tools:
 - 本 skill 仅处理 vibe-review 的误报，不处理其他 skill 的问题
 - 验证步骤必须通过才能将该 issue 纳入 PR，失败的 issue 不阻塞其他 issue
 - Claude 不修改 `google-cpp-style-guide.md` 等外部引用文件
-- issue 缺少必填字段时，跳过该 issue 并在终端提示
+- issue 缺少必填字段时，跳过该 issue 并在终端提示（解析失败不中断批量流程）
+- 向 `false-positives.md` 追加条目时，必须插入到文件中已有的对应分类下（空指针类/整数溢出类等），保持文件结构；若无匹配分类则新建分类
 
 ---
 
