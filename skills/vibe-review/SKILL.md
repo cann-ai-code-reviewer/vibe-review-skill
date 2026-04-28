@@ -40,6 +40,7 @@ $ARGUMENTS
 | --------------- | ------------------------------------------------------------------------ |
 | hccl, hcomm     | standards-productline-cann-cpp.md + standards-project-hccl.md            |
 | ops-transformer | standards-productline-cann-cpp.md + standards-project-ops-transformer.md |
+| omni-ops        | standards-productline-cann-cpp.md + standards-project-ops-transformer.md |
 | ops-nn          | standards-productline-cann-cpp.md + standards-project-ops-nn.md          |
 | CANN其他仓      | standards-productline-cann-cpp.md                                        |
 | 非CANN          | （无额外标准）                                                           |
